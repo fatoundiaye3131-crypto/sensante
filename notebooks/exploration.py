@@ -48,3 +48,8 @@ print(f"\n{'-' * 50}")
 print("Exploration terminee !")
 print("Prochain lab : entrainer un modele ML")
 print(f"{'-' * 50}")
+# ===== PATIENTS PAR SEXE ET DIAGNOSTIC =====
+print(f"\n--- Patients par sexe et diagnostic ---")
+sex_diag = df.groupby(["sexe", "diagnostic"]).size()
+for (sexe, diag), count in sex_diag.items():
+    print(f"  {sexe} - {diag:12s} : {count:3d} patients")
