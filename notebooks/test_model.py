@@ -100,3 +100,81 @@ for patient in patients:
 
 print("\n[3/3] Test terminé !")
 print("=" * 50)
+
+# ===== EXERCICE 2 : TESTER AVEC DIFFÉRENTS PATIENTS =====
+print("\n" + "=" * 60)
+print("EXERCICE 2 : Prédictions pour 3 profils différents")
+print("=" * 60)
+
+# Définition des 3 patients
+patients_exercice = [
+    {
+        'nom': 'Patient A - Jeune sans symptômes',
+        'age': 18,
+        'sexe': 'F',
+        'temperature': 36.7,
+        'tension_sys': 110,
+        'toux': 0,
+        'fatigue': 0,
+        'maux_tete': 0,
+        'region': 'Dakar',
+        'description': 'Jeune étudiante, aucun symptôme'
+    },
+    {
+        'nom': 'Patient B - Adulte avec forte fièvre',
+        'age': 32,
+        'sexe': 'M',
+        'temperature': 40.2,
+        'tension_sys': 100,
+        'toux': 0,
+        'fatigue': 1,
+        'maux_tete': 1,
+        'region': 'Thiès',
+        'description': 'Homme, forte fièvre + fatigue + maux de tête'
+    },
+    {
+        'nom': 'Patient C - Patient âgé avec toux',
+        'age': 72,
+        'sexe': 'M',
+        'temperature': 38.5,
+        'tension_sys': 135,
+        'toux': 1,
+        'fatigue': 1,
+        'maux_tete': 0,
+        'region': 'Saint-Louis',
+        'description': 'Personne âgée, toux persistante et fatigue'
+    }
+]
+
+print("\nRésultats des prédictions :")
+print("-" * 80)
+
+for patient in patients_exercice:
+    # Encodage
+    sexe_enc = le_sexe.transform([patient['sexe']])[0]
+    region_enc = le_region.transform([patient['region']])[0]
+    
+    # Features
+    features = [[
+        patient['age'],
+        sexe_enc,
+        patient['temperature'],
+        patient['tension_sys'],
+        patient['toux'],
+        patient['fatigue'],
+        patient['maux_tete'],
+        region_enc
+    ]]
+    
+    # Prédiction
+    prediction = model.predict(features)[0]
+    proba = model.predict_proba(features)[0]
+    confiance = max(proba) * 100
+    
+    print(f"\n{patient['nom']}")
+    print(f"  Description : {patient['description']}")
+    print(f"  Température : {patient['temperature']}°C")
+    print(f"  → Diagnostic : {prediction}")
+    print(f"  → Confiance : {confiance:.1f}%")
+
+print("\n" + "-" * 80)
