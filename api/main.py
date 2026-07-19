@@ -1,9 +1,10 @@
+# api/main.py complet avec le nouvel endpoint /model-info
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 import joblib
 import numpy as np
 
-# Schémas Pydantic (validation automatique)
+# Schémas Pydantic
 class PatientInput(BaseModel):
     age: int = Field(..., ge=0, le=120)
     sexe: str = Field(...)
@@ -20,25 +21,47 @@ class DiagnosticOutput(BaseModel):
     confiance: str
     message: str
 
-# Application FastAPI
+# Application
 app = FastAPI(title="SenSante API", version="0.2.0")
+from fastapi.middleware.cors import CORSMiddleware
 
-# Chargement du modèle (au démarrage, une seule fois)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Chargement du modèle
 print("Chargement du modèle...")
 model = joblib.load("models/model.pkl")
 le_sexe = joblib.load("models/encoder_sexe.pkl")
 le_region = joblib.load("models/encoder_region.pkl")
+feature_cols = joblib.load("models/feature_cols.pkl")
 print(f"Modèle chargé : {list(model.classes_)}")
 
-# Endpoint de santé
+# Endpoint 1 : Health check
 @app.get("/health")
 def health_check():
     return {"status": "ok", "message": "SenSante API is running"}
 
-# Endpoint de prédiction
+# Endpoint 2 : Informations sur le modèle (NOUVEAU)
+@app.get("/model-info")
+def model_info():
+    return {
+        "type": type(model).__name__,
+        "n_estimators": model.n_estimators,
+        "max_depth": model.max_depth,
+        "classes": list(model.classes_),
+        "n_features": model.n_features_in_,
+        "feature_names": feature_cols
+    }
+
+
+# Endpoint 3 : Prédiction
 @app.post("/predict", response_model=DiagnosticOutput)
 def predict(patient: PatientInput):
-    # Encodage des variables catégorielles
     try:
         sexe_enc = le_sexe.transform([patient.sexe])[0]
     except ValueError:
@@ -53,35 +76,31 @@ def predict(patient: PatientInput):
             diagnostic="erreur", probabilite=0.0,
             confiance="aucune", message=f"Région inconnue : {patient.region}"
         )
-
-    # Construction du vecteur de features
+    
     features = np.array([[
         patient.age, sexe_enc, patient.temperature,
         patient.tension_sys, int(patient.toux),
         int(patient.fatigue), int(patient.maux_tete),
         region_enc
     ]])
-
-    # Prédiction
+    
     diagnostic = model.predict(features)[0]
     proba_max = float(model.predict_proba(features)[0].max())
-
-    # Niveau de confiance
+    
     if proba_max >= 0.7:
         confiance = "haute"
     elif proba_max >= 0.4:
         confiance = "moyenne"
     else:
         confiance = "faible"
-
-    # Messages personnalisés
+    
     messages = {
-        "palu": "Suspicion de paludisme. Consultez un médecin rapidement.",
+        "paludisme": "Suspicion de paludisme. Consultez un médecin rapidement.",
         "grippe": "Suspicion de grippe. Repos et hydratation recommandés.",
-        "typh": "Suspicion de typhoïde. Consultation médicale nécessaire.",
+        "typhoide": "Suspicion de typhoïde. Consultation médicale nécessaire.",
         "sain": "Pas de pathologie détectée. Continuez à surveiller."
     }
-
+    
     return DiagnosticOutput(
         diagnostic=diagnostic,
         probabilite=round(proba_max, 2),

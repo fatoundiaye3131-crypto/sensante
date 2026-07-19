@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SenSante - Pre-diagnostic</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-blue-600 text-white py-4 shadow-lg">
+    <div class="max-w-4xl mx-auto px-4">
+      <h1 class="text-2xl font-bold">&#x1F3E5; SenSante</h1>
+      <p class="text-blue-100 text-sm">Assistant pre-diagnostic medical — ESP/UCAD</p>
+    </div>
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- ========== COLONNE GAUCHE : FORMULAIRE ========== -->
+      <div id="form-section" class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+          &#x1F4CB; Symptomes du patient
+        </h2>
+
+        <!-- Age -->
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Age (annees)
+          </label>
+          <input
+            type="number"
+            id="age"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Ex: 28"
+            min="0"
+            max="120"
+          >
+        </div>
+
+        <!-- Sexe -->
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Sexe</label>
+          <select
+            id="sexe"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value="F">Feminin</option>
+            <option value="M">Masculin</option>
+          </select>
+        </div>
+
+        <!-- Temperature -->
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Temperature (°C)
+          </label>
+          <input
+            type="number"
+            id="temperature"
+            step="0.1"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Ex: 38.5"
+            min="35"
+            max="42"
+          >
+        </div>
+
+        <!-- Tension systolique -->
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Tension systolique (mmHg)
+          </label>
+          <input
+            type="number"
+            id="tension_sys"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Ex: 120"
+            min="60"
+            max="250"
+          >
+        </div>
+
+        <!-- Symptomes (checkboxes) -->
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Symptomes</label>
+          <div class="space-y-2">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="toux" class="rounded text-blue-600 mr-2 h-4 w-4">
+              <span class="text-gray-700">&#x1F927; Toux</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="fatigue" class="rounded text-blue-600 mr-2 h-4 w-4">
+              <span class="text-gray-700">&#x1F634; Fatigue</span>
+            </label>
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="maux_tete" class="rounded text-blue-600 mr-2 h-4 w-4">
+              <span class="text-gray-700">&#x1F915; Maux de tete</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Region -->
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+          <select
+            id="region"
+            class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value="Dakar">Dakar</option>
+            <option value="Thies">Thies</option>
+            <option value="Saint-Louis">Saint-Louis</option>
+            <option value="Ziguinchor">Ziguinchor</option>
+            <option value="Tambacounda">Tambacounda</option>
+            <option value="Kaolack">Kaolack</option>
+            <option value="Diourbel">Diourbel</option>
+            <option value="Fatick">Fatick</option>
+            <option value="Kolda">Kolda</option>
+            <option value="Matam">Matam</option>
+          </select>
+        </div>
+
+        <!-- Bouton Diagnostiquer -->
+        <button
+          onclick="diagnostiquer()"
+          id="btn-diag"
+          class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md text-lg"
+        >
+          &#x1F50D; Diagnostiquer
+        </button>
+
+        <!-- Bouton Reinitialiser -->
+        <button
+          onclick="reinitialiser()"
+          class="w-full mt-2 bg-gray-100 text-gray-600 font-medium py-2 rounded-lg hover:bg-gray-200 transition duration-200 text-sm"
+        >
+          &#x21BA; Reinitialiser le formulaire
+        </button>
+      </div>
+
+      <!-- ========== COLONNE DROITE : RESULTAT ========== -->
+      <div id="result-section">
+        <div class="bg-white rounded-xl shadow-md p-6 text-center text-gray-400">
+          <p class="text-5xl mb-3">&#x1F489;</p>
+          <p class="font-medium text-gray-500">Remplissez le formulaire</p>
+          <p class="text-sm mt-1">puis cliquez sur Diagnostiquer</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== HISTORIQUE DES CONSULTATIONS (Exercice 2) ========== -->
+    <div id="historique-section" class="mt-8 hidden">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">
+          &#x1F4D1; Historique des consultations (5 dernieres)
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="py-2 px-3 text-gray-500 font-medium">#</th>
+                <th class="py-2 px-3 text-gray-500 font-medium">Age / Sexe</th>
+                <th class="py-2 px-3 text-gray-500 font-medium">Region</th>
+                <th class="py-2 px-3 text-gray-500 font-medium">Diagnostic</th>
+                <th class="py-2 px-3 text-gray-500 font-medium">Probabilite</th>
+                <th class="py-2 px-3 text-gray-500 font-medium">Confiance</th>
+              </tr>
+            </thead>
+            <tbody id="historique-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-gray-400 text-sm py-6 mt-4 border-t border-gray-200">
+    SenSante v0.3 &mdash; ESP / UCAD &mdash; L2 GLSI 2026
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+
+    // URL de l'API (changer si l'API est deployee ailleurs)
+    const API_URL = "http://localhost:8000";
+
+    // Tableau pour l'historique des consultations (Exercice 2)
+    const historique = [];
+
+    // -------------------------------------------------------
+    // FONCTION PRINCIPALE : diagnostiquer()
+    // -------------------------------------------------------
+    async function diagnostiquer() {
+
+      // 1. Recuperer les valeurs du formulaire
+      const patient = {
+        age:         parseInt(document.getElementById("age").value),
+        sexe:        document.getElementById("sexe").value,
+        temperature: parseFloat(document.getElementById("temperature").value),
+        tension_sys: parseInt(document.getElementById("tension_sys").value),
+        toux:        document.getElementById("toux").checked,
+        fatigue:     document.getElementById("fatigue").checked,
+        maux_tete:   document.getElementById("maux_tete").checked,
+        region:      document.getElementById("region").value
+      };
+
+      // 2. Verifier les champs obligatoires
+      if (!patient.age || isNaN(patient.age) ||
+          !patient.temperature || isNaN(patient.temperature) ||
+          !patient.tension_sys || isNaN(patient.tension_sys)) {
+        afficherErreur("Veuillez remplir tous les champs numeriques (Age, Temperature, Tension).");
+        return;
+      }
+
+      // 3. Afficher le spinner de chargement
+      afficherChargement();
+
+      try {
+        // 4. Envoyer la requete a l'API via fetch()
+        const response = await fetch(API_URL + "/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patient)
+        });
+
+        // 5. Verifier la reponse HTTP
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(
+            err.detail ? JSON.stringify(err.detail) : "Erreur serveur"
+          );
+        }
+
+        // 6. Lire le resultat JSON
+        const resultat = await response.json();
+
+        // 7. Afficher le resultat avec code couleur
+        afficherResultat(resultat);
+
+        // 8. Ajouter a l'historique (Exercice 2)
+        ajouterHistorique(patient, resultat);
+
+      } catch (error) {
+        afficherErreur("Erreur de connexion : " + error.message);
+      }
+    }
+
+    // -------------------------------------------------------
+    // AFFICHER LE SPINNER DE CHARGEMENT
+    // -------------------------------------------------------
+    function afficherChargement() {
+      const section = document.getElementById("result-section");
+      section.innerHTML = `
+        <div class="bg-white rounded-xl shadow-md p-6 text-center">
+          <div class="animate-spin rounded-full h-14 w-14 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p class="text-gray-500 font-medium">Analyse en cours...</p>
+          <p class="text-gray-400 text-sm mt-1">Interrogation du modele IA</p>
+        </div>`;
+    }
+
+    // -------------------------------------------------------
+    // AFFICHER LE RESULTAT AVEC CODE COULEUR
+    // -------------------------------------------------------
+    function afficherResultat(r) {
+
+      // Icones par diagnostic (Exercice 1)
+      const icones = {
+        paludisme: "&#x1F9A0;",   // microbe
+        grippe:    "&#x2744;&#xFE0F;",  // flocon
+        typhoide:  "&#x1F321;&#xFE0F;", // thermometre
+        sain:      "&#x2705;"     // check vert
+      };
+
+      // Codes couleur par diagnostic
+      const couleurs = {
+        paludisme: { bg: "bg-red-100",    text: "text-red-800",    bar: "bg-red-500",    badge: "bg-red-500",    border: "border-red-300"    },
+        grippe:    { bg: "bg-orange-100", text: "text-orange-800", bar: "bg-orange-500", badge: "bg-orange-500", border: "border-orange-300" },
+        typhoide:  { bg: "bg-yellow-100", text: "text-yellow-800", bar: "bg-yellow-500", badge: "bg-yellow-500", border: "border-yellow-300" },
+        sain:      { bg: "bg-green-100",  text: "text-green-800",  bar: "bg-green-500",  badge: "bg-green-500",  border: "border-green-300"  }
+      };
+
+      const c   = couleurs[r.diagnostic] || couleurs["sain"];
+      const ico = icones[r.diagnostic]   || "&#x2753;";
+      const pct = Math.round(r.probabilite * 100);
+
+      const section = document.getElementById("result-section");
+      section.innerHTML = `
+        <div class="bg-white rounded-xl shadow-md p-6">
+
+          <!-- Titre -->
+          <h2 class="text-xl font-bold text-gray-800 mb-4">&#x1F4CA; Resultat</h2>
+
+          <!-- Diagnostic principal -->
+          <div class="${c.bg} border ${c.border} rounded-lg p-4 mb-4 text-center">
+            <p class="text-sm text-gray-500 mb-1">Diagnostic</p>
+            <p class="text-4xl mb-2">${ico}</p>
+            <p class="text-2xl font-bold ${c.text} uppercase tracking-wide">
+              ${r.diagnostic}
+            </p>
+          </div>
+
+          <!-- Barre de probabilite -->
+          <div class="mb-4">
+            <div class="flex justify-between mb-1">
+              <span class="text-sm text-gray-600">Probabilite</span>
+              <span class="text-sm font-bold ${c.text}">${pct}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+              <div
+                class="${c.bar} h-4 rounded-full transition-all duration-700"
+                style="width: ${pct}%">
+              </div>
+            </div>
+          </div>
+
+          <!-- Badge de confiance -->
+          <div class="flex items-center gap-2 mb-4">
+            <span class="${c.badge} text-white text-xs px-3 py-1 rounded-full font-medium">
+              ${r.confiance}
+            </span>
+            <span class="text-sm text-gray-500">niveau de confiance</span>
+          </div>
+
+          <!-- Message -->
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+            <p class="text-sm font-medium text-gray-500 mb-1">&#x1F4AC; Recommandation</p>
+            <p class="text-gray-700">${r.message}</p>
+          </div>
+
+          <!-- Nouveau diagnostic -->
+          <button
+            onclick="reinitialiserResultat()"
+            class="mt-4 w-full text-sm text-blue-600 hover:text-blue-800 font-medium py-2 border border-blue-200 rounded-lg hover:bg-blue-50 transition duration-200">
+            + Nouveau diagnostic
+          </button>
+        </div>`;
+    }
+
+    // -------------------------------------------------------
+    // AFFICHER UNE ERREUR
+    // -------------------------------------------------------
+    function afficherErreur(msg) {
+      const section = document.getElementById("result-section");
+      section.innerHTML = `
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+          <p class="text-red-600 text-2xl mb-2">&#x26A0;&#xFE0F;</p>
+          <p class="text-red-700 font-medium">${msg}</p>
+          <p class="text-red-400 text-sm mt-2">
+            Verifiez que l'API est demarree sur http://localhost:8000
+          </p>
+          <p class="text-red-400 text-xs mt-1">
+            Commande : <code class="bg-red-100 px-1 rounded">uvicorn api.main:app --reload</code>
+          </p>
+        </div>`;
+    }
+
+    // -------------------------------------------------------
+    // HISTORIQUE DES CONSULTATIONS (Exercice 2)
+    // -------------------------------------------------------
+    function ajouterHistorique(patient, resultat) {
+      // Garder seulement les 5 dernieres consultations
+      if (historique.length >= 5) {
+        historique.shift(); // supprimer la plus ancienne
+      }
+      historique.push({
+        age:        patient.age,
+        sexe:       patient.sexe,
+        region:     patient.region,
+        diagnostic: resultat.diagnostic,
+        probabilite: Math.round(resultat.probabilite * 100),
+        confiance:  resultat.confiance
+      });
+      afficherHistorique();
+    }
+
+    function afficherHistorique() {
+      const section = document.getElementById("historique-section");
+      const tbody   = document.getElementById("historique-body");
+      section.classList.remove("hidden");
+
+      const couleursBadge = {
+        paludisme: "bg-red-100 text-red-700",
+        grippe:    "bg-orange-100 text-orange-700",
+        typhoide:  "bg-yellow-100 text-yellow-700",
+        sain:      "bg-green-100 text-green-700"
+      };
+
+      tbody.innerHTML = historique
+        .slice()
+        .reverse()
+        .map((c, i) => `
+          <tr class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="py-2 px-3 text-gray-400">${historique.length - i}</td>
+            <td class="py-2 px-3 text-gray-700">${c.age} ans / ${c.sexe}</td>
+            <td class="py-2 px-3 text-gray-600">${c.region}</td>
+            <td class="py-2 px-3">
+              <span class="px-2 py-1 rounded-full text-xs font-medium ${couleursBadge[c.diagnostic] || 'bg-gray-100 text-gray-700'}">
+                ${c.diagnostic}
+              </span>
+            </td>
+            <td class="py-2 px-3 font-medium text-gray-700">${c.probabilite}%</td>
+            <td class="py-2 px-3 text-gray-500 text-xs">${c.confiance}</td>
+          </tr>`)
+        .join('');
+    }
+
+    // -------------------------------------------------------
+    // REINITIALISER
+    // -------------------------------------------------------
+    function reinitialiser() {
+      document.getElementById("age").value          = "";
+      document.getElementById("temperature").value  = "";
+      document.getElementById("tension_sys").value  = "";
+      document.getElementById("toux").checked       = false;
+      document.getElementById("fatigue").checked    = false;
+      document.getElementById("maux_tete").checked  = false;
+      document.getElementById("sexe").value         = "F";
+      document.getElementById("region").value       = "Dakar";
+      reinitialiserResultat();
+    }
+
+    function reinitialiserResultat() {
+      const section = document.getElementById("result-section");
+      section.innerHTML = `
+        <div class="bg-white rounded-xl shadow-md p-6 text-center text-gray-400">
+          <p class="text-5xl mb-3">&#x1F489;</p>
+          <p class="font-medium text-gray-500">Remplissez le formulaire</p>
+          <p class="text-sm mt-1">puis cliquez sur Diagnostiquer</p>
+        </div>`;
+    }
+
+    // Permettre d'appuyer sur Entree dans le formulaire
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") diagnostiquer();
+    });
+
+  </script>
+</body>
+</html>
